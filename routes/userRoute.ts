@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { handleRegisterUser,handleLoginUser} from "../controllers/userController.ts";
+import { handleRegisterUser,handleLoginUser,hanldeRefreshToken} from "../controllers/userController.ts";
 
 
 const router=Router()
 
 router.post("/register",handleRegisterUser)
 router.post("/login",handleLoginUser)
+router.post("/refresh",hanldeRefreshToken)
 
 
 
