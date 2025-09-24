@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import User from "../models/User.ts";
-import { ValidationError } from "sequelize";
-import {generateToken} from '../utils/jwt.ts'
+import {  ValidationError } from "sequelize";
+import {generateToken, verifyrefreshToken,payload} from '../utils/jwt.ts'
+import {redisClient} from '../config/redis.ts'
 
 
 
@@ -15,6 +16,10 @@ interface RegisterUserBody {
 interface LoginUserBody {
   email: string;
   password: string;
+}
+
+interface RefreshTokenBody {
+  refreshToken: string;
 }
 
 const handleRegisterUser = async (
@@ -115,5 +120,43 @@ const handleLoginUser = async (
 };
 
 
+const hanldeRefreshToken=async(req:Request<{},{},RefreshTokenBody>,res:Response) :Promise<Response>=>{
 
-export { handleRegisterUser, handleLoginUser };
+  try {
+    const {refreshToken}=req.body;
+  if(!refreshToken) return res.status(401).json({success:false,error:"Refresh token required"})
+  
+  // check for blacklisted token
+     const isBlacklisted = await redisClient.get(refreshToken);
+    if (isBlacklisted) return res.status(403).json({success:false,error: "Token blacklisted" });
+
+    const decode:payload=verifyrefreshToken(refreshToken)
+    const user=await User.findByPk(decode.id)
+    if(!user) return res.status(404).json({success:false,error:"User not found"})
+
+    const tokens=generateToken({id:user.id,name:user.name,role:user.role})
+
+    return res.status(201).json({success:true,accessToken:tokens.accessToken,refreshToken:tokens.refreshToken})
+
+    
+  } catch (error) {
+
+    //Server Error
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ success: false, error: `Server Error ${error.message}` });
+    }
+
+    //Unknown Server Error
+    return res.status(500).json({
+      success: false,
+      error: "Unknown server error",
+    });
+  }
+  
+
+}
+
+
+export { handleRegisterUser, handleLoginUser,hanldeRefreshToken };
