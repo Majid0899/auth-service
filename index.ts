@@ -18,7 +18,7 @@ app.get('/', (req: Request, res: Response):void => {
   res.send('Welcome to Auth Service');
 });
 
-app.use("/user",userRouter)
+app.use("/api/auth",userRouter)
 
 // Start server
 app.listen(PORT, (): void => {
