@@ -186,7 +186,7 @@ const hanldeRefreshToken = async (
 const handleLogoutUser = async (
   req: Request<{}, {}, RefreshTokenBody>,
   res: Response
-) => {
+) : Promise<Response>=> {
   try {
     const { refreshToken } = req.body;
     if (!refreshToken)
@@ -196,13 +196,13 @@ const handleLogoutUser = async (
 
     
     // Store in Redis blacklist until expiry
-    const decoded = verifyrefreshToken(refreshToken);
-    console.log(decoded)
+    const decoded  = verifyrefreshToken(refreshToken);
+    
 
     if(!decoded.exp) return res.status(400).json({ success: false, error: "Invalid refresh token: no expiry" });
     
     // Calculate remaining lifetime (in seconds)
-    const expiry = decoded.exp - Math.floor(Date.now() / 1000);
+    const expiry : number = decoded.exp - Math.floor(Date.now() / 1000);
     
 
     if(expiry<=0) return res.status(400).json({success:false,error:"Invalid refresh token: no expiry"})
@@ -228,9 +228,55 @@ const handleLogoutUser = async (
   }
 };
 
+
+
+const handleGoogleLogin=async(
+  req:Request,
+  res:Response
+): Promise<Response>=>{
+  try {
+
+    const user = req.user as any;
+
+    const payload = {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+    };
+
+    // Generate access & refresh tokens
+    const tokens = generateToken(payload);
+
+    return res.json({success:true,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user:payload
+    });
+    
+  } catch (error) {
+    //Server Error
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ success: false, error: `Server Error ${error.message}` });
+    }
+
+    //Unknown Server Error
+    return res.status(500).json({
+      success: false,
+      error: "Unknown server error",
+    });
+    
+  }
+}
+  
+
+
+
 export {
   handleRegisterUser,
   handleLoginUser,
   hanldeRefreshToken,
   handleLogoutUser,
+  handleGoogleLogin
 };
