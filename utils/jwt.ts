@@ -8,8 +8,9 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refreshsecret";
 interface payload {
     id:number,
     name:string,
-    role:"user" | "admin"
+    role:"user" | "admin",
 }
+
 
 const generateToken=(user:payload):{accessToken:string,refreshToken:string}=>{
 
@@ -29,12 +30,13 @@ const verifyaccessToken=(token:string):payload=>{
     }
 }
 
-const verifyrefreshToken=(token:string):payload=>{
-    const decoded=jwt.verify(token,JWT_SECRET) as JwtPayload
+const verifyrefreshToken=(token:string):payload & {exp?:number}=>{
+    const decoded=jwt.verify(token,JWT_REFRESH_SECRET) as JwtPayload
     return {
         id:decoded.id as number,
         name:decoded.name as string,
         role:decoded.role as "user" | "admin",
+        exp:decoded.exp
     }
 }
 
