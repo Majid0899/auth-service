@@ -1,4 +1,4 @@
-// src/config/googleAuth.js
+
 import passport from "passport";
 import { Strategy as GoogleStrategy,Profile,VerifyCallback } from "passport-google-oauth20";
 

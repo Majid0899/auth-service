@@ -271,6 +271,44 @@ const handleGoogleLogin=async(
 }
   
 
+const handleGithubLogin=async(
+  req:Request,
+  res:Response
+) : Promise<Response>=>{
+  try {
+    const user = req.user as any;
+
+    const payload = {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+    };
+
+    // Generate access & refresh tokens
+    const tokens = generateToken(payload);
+
+    return res.json({success:true,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user:payload
+    });
+  } catch (error) {
+    //Server Error
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ success: false, error: `Server Error ${error.message}` });
+    }
+
+    //Unknown Server Error
+    return res.status(500).json({
+      success: false,
+      error: "Unknown server error",
+    });
+    
+  }
+}
+
 
 
 export {
@@ -278,5 +316,6 @@ export {
   handleLoginUser,
   hanldeRefreshToken,
   handleLogoutUser,
-  handleGoogleLogin
+  handleGoogleLogin,
+  handleGithubLogin
 };
