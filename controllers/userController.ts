@@ -8,7 +8,14 @@ interface RegisterUserBody {
   name: string;
   email: string;
   password: string;
+  phone:string;
   role?: "user" | "admin";
+}
+
+interface ResponseBody{
+  name:string,
+  email:string,
+  phone:string,
 }
 
 interface LoginUserBody {
@@ -25,7 +32,7 @@ const handleRegisterUser = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, phone,role } = req.body;
 
     //Check if user already exist
     const existingUser = await User.findOne({ where: { email: email } });
@@ -36,7 +43,7 @@ const handleRegisterUser = async (
     }
 
     //create user
-    await User.create({ name, email, password, role });
+    await User.create({ name, email, password, phone,role });
 
     return res.status(201).json({ success: true, message: "User is created." });
   } catch (error) {
@@ -310,6 +317,65 @@ const handleGithubLogin=async(
 }
 
 
+const handleProfile=async(
+  req:Request,
+  res:Response
+) :Promise<Response>=>{
+  try {
+
+    if(!req.user){
+      return res.status(400).json({success:false,error:"Unauthorized"})
+    }
+    const user=await User.findByPk(req.user.id)
+
+    return res.status(200).json({success:true,user})
+    
+  } catch (error) {
+    //Server Error
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ success: false, error: `Server Error ${error.message}` });
+    }
+
+    //Unknown Server Error
+    return res.status(500).json({
+      success: false,
+      error: "Unknown server error",
+    });
+  }
+}
+
+
+const handleListAllUser=async(
+  req:Request,
+  res:Response
+):Promise<Response> =>{
+  try {
+    const allusers:User[]=await User.findAll();
+
+    if(allusers.length===0){
+      return res.status(200).json({success:true,message:"No users found"})
+    }
+
+    return res.status(200).json({success:true,allusers})
+    
+  } catch (error) {
+    //Server Error
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ success: false, error: `Server Error ${error.message}` });
+    }
+
+    //Unknown Server Error
+    return res.status(500).json({
+      success: false,
+      error: "Unknown server error",
+    });
+  }
+
+}
 
 export {
   handleRegisterUser,
@@ -317,5 +383,7 @@ export {
   hanldeRefreshToken,
   handleLogoutUser,
   handleGoogleLogin,
-  handleGithubLogin
+  handleGithubLogin,
+handleProfile,
+handleListAllUser
 };

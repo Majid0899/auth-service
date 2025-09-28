@@ -13,6 +13,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare name: string;
   declare email: string;
   declare password: string;
+  declare phone?:string;
   declare role: CreationOptional<"user" | "admin">;
   declare readonly createdAt: CreationOptional<Date>;
   declare readonly updatedAt: CreationOptional<Date>;
@@ -69,6 +70,20 @@ User.init(
       allowNull: false,
       defaultValue: "user",
     },
+    phone: {
+  type: DataTypes.STRING(15),
+  defaultValue:"0000000000",
+  validate: {
+    is: {
+      args: /^[0-9()+-\s]*$/, // allows digits, spaces, +, -, ()
+      msg: "Phone number contains invalid characters",
+    },
+    len: {
+      args: [7, 15], // adjust min/max length as needed
+      msg: "Phone number must be between 7 and 15 digits",
+    },
+  },
+},
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

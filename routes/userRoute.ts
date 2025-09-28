@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { handleRegisterUser,handleLoginUser,hanldeRefreshToken,handleLogoutUser} from "../controllers/userController.ts";
-
-
+import { handleRegisterUser,handleLoginUser,hanldeRefreshToken,handleLogoutUser,handleProfile,handleListAllUser} from "../controllers/userController.ts";
+import auth from '../middleware/authmiddleware.ts'
 const router=Router()
 
 router.post("/register",handleRegisterUser)
@@ -10,5 +9,10 @@ router.post("/refresh",hanldeRefreshToken)
 router.post("/logout",handleLogoutUser)
 
 
+//Protected Example
+router.get("/profile",auth.authenticate,handleProfile)
+
+//Admin only Route
+router.get("/users",auth.authenticate,auth.authorizeRoles(["admin"]),handleListAllUser)
 
 export default router
