@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "main": "/dist/index.js",
-  "scripts": {
-    "dev": "nodemon --watch './**/*.ts' --exec 'node --loader ts-node/esm' index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
+ "scripts": {
+  "dev": "nodemon --watch src --ext ts --exec \"node --import 'data:text/javascript,import { register } from \\\"node:module\\\"; import { pathToFileURL } from \\\"node:url\\\"; register(\\\"ts-node/esm\\\", pathToFileURL(\\\"./\\\"));' ./index.ts\"",
+  "build": "tsc",
+  "start": "node dist/index.js"
+}
+,
   "keywords": [],
   "author": "Majidkhan",
   "license": "ISC",
