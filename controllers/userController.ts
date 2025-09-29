@@ -26,6 +26,7 @@ interface LoginUserBody {
 interface RefreshTokenBody {
   refreshToken: string;
 }
+const BLOCK_TIME:number=Number(process.env.BLOCK_TIME) || 15*60 // 15 minutes
 
 const handleRegisterUser = async (
   req: Request<{}, {}, RegisterUserBody>,
@@ -81,21 +82,35 @@ const handleLoginUser = async (
     const user = await User.scope("withPassword").findOne({
       where: { email: email },
     });
-    if (!user)
+    if (!user){
+      //increase the attempt and set the block time for email
+      await redisClient.incr(res.locals.loginKey)
+      await redisClient.expire(res.locals.loginKey,BLOCK_TIME)
       return res
         .status(404)
         .json({
           success: false,
           error: "Invalid email Please enter valid email",
         });
+    }
+      
 
     //compare password
     const isMatch = await user.comparePassword(password);
-    if (!isMatch)
+    if (!isMatch){
+      //increase the attempt and set the the block time for email
+      await redisClient.incr(res.locals.loginkey)
+      await redisClient.expire(res.locals.loginkey,BLOCK_TIME)
       return res
         .status(400)
         .json({ message: "Invalid Password Please enter valid password" });
 
+    }
+      
+
+    //clear failed attempts on success
+    await redisClient.del(res.locals.loginkey)
+    
     //payload for jwt
     const payload = {
       id: user.id,

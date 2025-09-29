@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { handleRegisterUser,handleLoginUser,hanldeRefreshToken,handleLogoutUser,handleProfile,handleListAllUser} from "../controllers/userController.ts";
 import auth from '../middleware/authmiddleware.ts'
+import {loginLimiter} from "../middleware/loginLimiter.ts"
 const router=Router()
 
 router.post("/register",handleRegisterUser)
-router.post("/login",handleLoginUser)
+router.post("/login",loginLimiter,handleLoginUser)
 router.post("/refresh",hanldeRefreshToken)
 router.post("/logout",handleLogoutUser)
 

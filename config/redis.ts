@@ -1,4 +1,4 @@
-// src/config/redis.ts
+
 import { createClient, RedisClientType } from "redis";
 
 const redisClient: RedisClientType = createClient({
