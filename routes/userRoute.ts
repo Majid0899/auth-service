@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { handleRegisterUser,handleLoginUser,hanldeRefreshToken,handleLogoutUser,handleProfile,handleListAllUser} from "../controllers/userController.ts";
-import auth from '../middleware/authmiddleware.ts'
-import {loginLimiter} from "../middleware/loginLimiter.ts"
+import { handleRegisterUser,handleLoginUser,hanldeRefreshToken,handleLogoutUser,handleProfile,handleListAllUser} from "../controllers/userController.js";
+import auth from '../middleware/authmiddleware.js'
+import {loginLimiter} from "../middleware/loginLimiter.js"
 const router=Router()
 
 router.post("/register",handleRegisterUser)

@@ -6,8 +6,8 @@ import passport from "passport";
 import {connectDB} from "./config/db.js"
 
 //Routes import
-import userRouter from "./routes/userRoute.ts"
-import oauthRouter from "./routes/oauthRoute.ts"
+import userRouter from "./routes/userRoute.js"
+import oauthRouter from "./routes/oauthRoute.js"
 
 dotenv.config();
 connectDB()

@@ -6,7 +6,7 @@ import {
   CreationOptional,
 } from "sequelize";
 import bcrypt from "bcrypt";
-import { sequelize } from "../config/db.ts";
+import { sequelize } from "../config/db.js";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;

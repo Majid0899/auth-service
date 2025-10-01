@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import User from "../models/User.ts";
+import User from "../models/User.js";
 import { ValidationError } from "sequelize";
-import { generateToken, verifyrefreshToken, payload } from "../utils/jwt.ts";
-import { redisClient } from "../config/redis.ts";
+import { generateToken, verifyrefreshToken, payload } from "../utils/jwt.js";
+import { redisClient } from "../config/redis.js";
 
 interface RegisterUserBody {
   name: string;
@@ -77,6 +77,7 @@ const handleLoginUser = async (
 ): Promise<Response> => {
   try {
     const { email, password } = req.body;
+    
 
     //Find user including password
     const user = await User.scope("withPassword").findOne({
@@ -99,8 +100,8 @@ const handleLoginUser = async (
     const isMatch = await user.comparePassword(password);
     if (!isMatch){
       //increase the attempt and set the the block time for email
-      await redisClient.incr(res.locals.loginkey)
-      await redisClient.expire(res.locals.loginkey,BLOCK_TIME)
+      await redisClient.incr(res.locals.loginKey)
+      await redisClient.expire(res.locals.loginKey,BLOCK_TIME)
       return res
         .status(400)
         .json({ message: "Invalid Password Please enter valid password" });
@@ -109,7 +110,7 @@ const handleLoginUser = async (
       
 
     //clear failed attempts on success
-    await redisClient.del(res.locals.loginkey)
+    await redisClient.del(res.locals.loginKey)
     
     //payload for jwt
     const payload = {
@@ -130,6 +131,7 @@ const handleLoginUser = async (
         user: payload,
       });
   } catch (error) {
+
     //Validation Error
     if (error instanceof ValidationError) {
       return res.status(400).json({

@@ -1,5 +1,5 @@
 import { Request,Response,NextFunction } from "express";
-import {redisClient} from "../config/redis.ts"
+import {redisClient} from "../config/redis.js"
 
 const MAX_ATTEMPTS:number=Number(process.env.MAX_ATTEMPTS) || 5;
 const BLOCK_TIME:number=Number(process.env.BLOCK_TIME) || 15*60 // 15 minutes

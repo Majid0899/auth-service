@@ -1,8 +1,8 @@
 import { Router } from "express";
 import passport from "passport";
-import "../config/googleAuth.ts";
-import "../config/githubAuth.ts";
-import { handleGoogleLogin,handleGithubLogin } from "../controllers/userController.ts";
+import "../config/googleAuth.js";
+import "../config/githubAuth.js";
+import { handleGoogleLogin,handleGithubLogin } from "../controllers/userController.js";
 const router = Router();
 
 router.get(
